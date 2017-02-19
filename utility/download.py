@@ -4,6 +4,7 @@
 import tushare as ts
 from sqlalchemy import create_engine
 import datetime
+from datetime import timedelta
 import time
 import pandas as pd
 import os
@@ -11,23 +12,31 @@ import cPickle
 from pandas import DataFrame
 import pandas.io.sql as SQL
 import sys
-from tool_decorator import local_memcached
-
+from tool_decorator import local_memcached,running_time
+from tool_class import NoInstance, Singleton
 
 def date2str(date):
     return date.strftime("%Y-%m-%d")
+
 
 class DownLoad(object):
     '''
     1.下载历史数据
     2. 更新每天数据
     3. 装载历史数据
+    4. 单例模式
     '''
-    def __init__(self):
+    __metaclass__ = Singleton
+    def __init__(self,*args, **kwargs):
         self.basic = ts.get_stock_basics()
         self.engine = create_engine('mysql://root:123456@127.0.0.1/stock_info?charset=utf8')
         self.connection = self.engine.connect()
 
+    def __del__(self):
+        '''
+        关掉连接
+        '''
+        pass
     @staticmethod
     def date2str(today=None):
         if today == None:
@@ -96,26 +105,48 @@ class DownLoad(object):
         添加stock,指定时间范围内的数据
         '''
         data = ts.get_h_data(stock,start=start,end=end)
-        data = data.sort_index(ascending=True)  
-        data.to_sql('day_'+stock, self.engine,if_exists='append')
+        if data is not None:
+            data = data.sort_index(ascending=True)  
+            data.to_sql('day_'+stock, self.engine,if_exists='append')
+            print "添加数据成功 {0}:{1}:{2}".format(stock, start, end)
 
-    def append_all_days(self, start=None, end=None):
+    @running_time
+    def update_everyday(self):
         '''
-        添加所有股票数据
+        每天更新股票数据
         '''
-        if start == None:
-            start = datetime.datetime.today()
-            end = start
-        for stock in self.basic['code']:
-            self.append_days(stock, start, end)
+        data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
+        for stock in data.index:
+            try:
+                search_sql = "select * from {0} order by date desc limit 1".format('day_'+stock)
+                origin = SQL.read_sql(search_sql, self.engine)
+                date_64 = (origin.tail(1))['date'].values[0]
+                next = pd.to_datetime(str(date_64)) + timedelta(1)
+                start = next.strftime("%Y-%m-%d")
+                end = datetime.datetime.now().strftime("%Y-%m-%d")
+                self.append_days(stock, start = start, end=end)
+            except Exception, data:
+                print "更新股票数据失败:{0} {1}".format(stock, data)
+                data = ts.get_h_data(stock)
+                if data is not None:
+                    data = data.sort_index(ascending=True) 
+                    data.to_sql('day_'+stock, self.engine,if_exists='append')
+                    print "尝试加载该新股票成功"
 
     def load_data(self, stock):
         '''
         加载股票历史数据
         '''
         search_sql = "select * from {0}".format('day_'+stock)
-        raw_data = SQL.read_sql(search_sql, self.engine)
-        return raw_data
+        try:
+            raw_data = SQL.read_sql(search_sql, self.engine)
+            return raw_data
+        except Exception,data:
+            data = ts.get_h_data(stock)
+            data = data.sort_index(ascending=True) 
+            data.to_sql('day_'+stock, self.engine,if_exists='append')
+            raw_data = SQL.read_sql(search_sql, self.engine)
+            return raw_data
 
     def check_is_new_stock(self, stock):
         '''
@@ -137,9 +168,11 @@ class DownLoad(object):
 #新股如603861 有问题
 
 
-
 #封装一下ts接口，同一天不要重复获取数据
+#不能实例化
 class TS(object):
+    __metaclass__ = NoInstance
+
     @staticmethod
     @local_memcached
     def memchaced_data(funcname, fileprefix):
@@ -153,8 +186,7 @@ class TS(object):
         data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
         '''
         pass
-        #raw_data = funcname()
-        #return raw_data
+
 
     @staticmethod
     def load_self_select_stock(filename):
@@ -168,10 +200,11 @@ class TS(object):
 
 
 if __name__ == '__main__':
-    # dl = DownLoad()
+    dl = DownLoad()
+    dl.update_everyday()
     # dl.down_all_day_stick()
     # raw_data = dl.load_data('000001')
     # print raw_data
 
-    aa = TS.memchaced_data(ts.get_profit_data, 'get_profit_data',2016,1)
-    print aa
+    # aa = TS.memchaced_data(ts.get_profit_data, 'get_profit_data',2016,1)
+    # print aa
