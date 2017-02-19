@@ -1,0 +1,31 @@
+获取基本数据，并且计算净资产收益率
+获取毛利润率财报表时间:2015年4季度
+[Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:][Getting data:]更新股票数据失败:300506 (_mysql_exceptions.ProgrammingError) (1146, "Table 'stock_info.day_300506' doesn't exist") [SQL: 'select * from day_300506 order by date desc limit 1']
+[Getting data:]####/root/anaconda2/lib/python2.7/site-packages/tushare/stock/trading.py:441: FutureWarning: sort(columns=....) is deprecated, use sort_values(by=.....)
+  df = df.sort('date', ascending=False)
+尝试加载该新股票成功
+[Getting data:]添加数据成功 600730:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 002134:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 300081:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 600593:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 002260:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 600604:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 002082:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 002650:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 002192:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 300011:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 600338:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 600171:2016-04-02-2016-04-17
+[Getting data:]html5lib not found, please install it
+添加数据成功 002366:2016-04-02-2016-04-17
+更新股票数据失败:002217 (_mysql_exceptions.ProgrammingError) (1146, "Table 'stock_info.day_002217' doesn't exist") [SQL: 'select * from day_002217 order by date desc limit 1']
+[Getting data:]####尝试加载该新股票成功
+[Getting data:]添加数据成功 300197:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 002119:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 002125:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 000698:2016-04-02-2016-04-17
+[Getting data:]##添加数据成功 600890:2015-10-01-2016-04-17
+[Getting data:]添加数据成功 002345:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 603788:2016-04-02-2016-04-17
+[Getting data:]添加数据成功 600807:2016-04-02-2016-04-17
+[Getting data:]
