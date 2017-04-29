@@ -101,10 +101,7 @@ class StockSelect(object):
         result = result[result['esp'] > 0.4]
         #按照净资产收益率排名
         result = result.sort(columns='earn_ratio',ascending=False)
-        for code in result.index[:100]:
-            #1. 过滤创业板股票，暂时不能买
-            if code.startswith('3'):
-                continue
+        for code in result.index[:200]:
             gross_profit_rate = None   #默认值
             if code in self.profit_data.index:
                 gross_profit_rate = self.profit_data.ix[code]['gross_profit_rate']
@@ -129,8 +126,8 @@ class StockSelect(object):
         raw_data = raw_data.sort_values(by=['totals'])
         raw_data = raw_data.sort_values(by=['reservedPerShare'],ascending=False)
         for code in raw_data.index:
-            if code.startswith('3'):
-                continue
+            #if code.startswith('3'):
+            #    continue
             gross_profit_rate = None
             if code in self.profit_data.index:
                 gross_profit_rate = self.profit_data.ix[code]['gross_profit_rate']
@@ -214,7 +211,7 @@ if __name__ == '__main__':
     # raw_data = ts.get_hist_data('sz',start='2015-01-05',end='2015-01-09')
     # print raw_data
     select = StockSelect()
-    #select.concept_analysis(u'充电桩')
+    #select.concept_analysis(u'养殖业')
     #select.concept_analysis(u'黄金概念')
     #select.capital_reserve()
     select.capital_earn_ratio()
