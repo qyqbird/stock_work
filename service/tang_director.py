@@ -6,16 +6,17 @@
 
 import tushare as ts
 import talib as ta
+import numpy as np
 from pandas import DataFrame
 import pandas.io.sql as SQL
 from sqlalchemy import create_engine
+import sys
 sys.path.append('../utility')
 sys.path.append('../stock_select')
 from download import DownLoad,TS
 
 
 def macd_judge(macdyellow,macdblue,macdhist,threshold):
-    return macd_hist(macdhist, threshold)
 
     def macd_hist(macdhist, threshold):
         '''
@@ -24,13 +25,12 @@ def macd_judge(macdyellow,macdblue,macdhist,threshold):
                threshold  柱子阈值，大于某个值才选择
         '''
         flag = False
-        if macdhist[0] < threshold:
+        if macdhist[-1] < threshold:
             return flag
-
-        mean_today = np.sum(macdhist[0:5]) / 5
-        mean_before = np.sum(macdhist[3:8]) / 5
+        mean_today = np.sum(macdhist[-6:-1]) / 5
+        mean_before = np.sum(macdhist[-9:-4]) / 5
         #抽象为 最近5天的macd 平均 是大于前3天的平均MACD的
-        if mean_today > mean_before and macdhist[0] > macdhist[1]:
+        if mean_today > mean_before and macdhist[-1] > macdhist[-2]:
             flag = True            
         return flag
 
@@ -42,7 +42,7 @@ def macd_judge(macdyellow,macdblue,macdhist,threshold):
             return True
         else:
             return False
-
+    return macd_hist(macdhist, threshold)
 def kdj_judge(slowk, slowd):
     '''
     KDJ比较敏感，需要仔细的调节
@@ -64,7 +64,7 @@ def tang_method(data, threshold):
     macdyellow, macdblue, macdhist = ta.MACD(np.asarray(data['close']), fastperiod=12, slowperiod=26, signalperiod=9)
     if macd_judge(macdyellow, macdblue, macdhist, threshold):
         #slowk, slowd = ta.STOCH(np.asarray(data['high']),np.asarray(data['low']), np.asarray(data['close']), 
-                                    fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+        #                            fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
         # if kdj_judge(slowk, slowd):
         #     flag = True
         flag = True
@@ -73,22 +73,12 @@ def tang_method(data, threshold):
 
 
 class TangPlan(object):
-    def __init__():
+    def __init__(self):
         #用于本地Mysql 获取数据
-        self.engine = create_engine('mysql://root:123456@127.0.0.1/stock_info?chharset=utf8')
-        self.connection = self.engine.connect()
         self.init_foundmental_data()
-        self.season_writer = None
-        self.month_writer = None
-        self.week_writer = None
-        self.day_writer = None
 
-    def __del__():
-        self.season_writer.close()
-        self.month_writer.close()
-        self.week_writer.close()
-        self.day_writer.close()
-
+    def __del__(self):
+        pass
 
     def init_foundmental_data(self):
         self.foundmental_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
@@ -101,9 +91,9 @@ class TangPlan(object):
         # week_writer = open('week_health', 'w')
         # day_writer = open('day_health', 'w')
         #for code in raw_data.index:
-        monthdata = ts.get_k_data('600848', ktype='M')
-        weekdata = ts.get_k_data('600848', ktype='W')
-        daydata = ts.get_k_data('600848', ktype='D')
+        monthdata = ts.get_k_data('300156', ktype='M')
+        weekdata = ts.get_k_data('300156', ktype='W')
+        daydata = ts.get_k_data('300156', ktype='D')
         print tang_method(monthdata, -0.7)
         print tang_method(weekdata, -0.35)
         print tang_method(daydata, -0.15)
