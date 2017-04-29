@@ -16,9 +16,9 @@ sys.path.append('../stock_select')
 from download import DownLoad,TS
 
 
-def macd_judge(macdyellow,macdblue,macdhist,threshold):
+def macd_judge(macdyellow,macdblue,macdhist,leftthreshold, rigththreshold):
 
-    def macd_hist(macdhist, threshold):
+    def macd_hist(macdhist):
         '''
         判断MCAD 柱子曲线 是否是合适介入的状态
         param: macdhist 今天排在倒数第一个
@@ -26,7 +26,7 @@ def macd_judge(macdyellow,macdblue,macdhist,threshold):
         '''
         flag = False
         try:
-            if macdhist[-1] < threshold:
+            if macdhist[-1] < leftthreshold or macdhist[-1] > rigththreshold:
                 return flag
             mean_today = np.sum(macdhist[-6:-1]) / 5
             mean_before = np.sum(macdhist[-9:-4]) / 5
@@ -45,7 +45,7 @@ def macd_judge(macdyellow,macdblue,macdhist,threshold):
             return True
         else:
             return False
-    return macd_hist(macdhist, threshold)
+    return macd_hist(macdhist)
 def kdj_judge(slowk, slowd):
     '''
     KDJ比较敏感，需要仔细的调节
@@ -62,11 +62,11 @@ def kdj_judge(slowk, slowd):
 
     return falg
 
-def tang_method(data, threshold):
+def tang_method(data, leftthreshold, rigththreshold):
     flag = False
     try:
         macdyellow, macdblue, macdhist = ta.MACD(np.asarray(data['close']), fastperiod=12, slowperiod=26, signalperiod=9)
-        if macd_judge(macdyellow, macdblue, macdhist, threshold):
+        if macd_judge(macdyellow, macdblue, macdhist, leftthreshold,rigththreshold):
             #slowk, slowd = ta.STOCH(np.asarray(data['high']),np.asarray(data['low']), np.asarray(data['close']), 
             #                            fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
             # if kdj_judge(slowk, slowd):
@@ -105,11 +105,11 @@ class TangPlan(object):
             weekdata = ts.get_k_data(code, ktype='W')
             daydata = ts.get_k_data(code, ktype='D')
 
-            if tang_method(monthdata, -0.7):
+            if tang_method(monthdata, -0.8, 1.5):
                 month_writer.write(code + '\t' + str(earn_ratio) + '\n')
-                if tang_method(weekdata, -0.35):
+                if tang_method(weekdata, -0.5, 0.8):
                     week_writer.write(code + '\t' + str(earn_ratio) + '\n')
-                    if tang_method(daydata,-0.15):
+                    if tang_method(daydata,-0.2, 0.6):
                         day_writer.write(code + '\t' + str(earn_ratio) + '\n')
                         print code
             sys.stdout.flush()
