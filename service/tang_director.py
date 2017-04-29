@@ -3,40 +3,45 @@
 #Author:yuqing.qin
 #desc: 实现唐主任的十步选股法
 #引用：http://weibo.com/ttarticle/p/show?id=2309403967380018599156
-#引用资料:
+
 import tushare as ts
 import talib as ta
 from pandas import DataFrame
 import pandas.io.sql as SQL
 from sqlalchemy import create_engine
 sys.path.append('../utility')
+sys.path.append('../stock_select')
 from download import DownLoad,TS
 
 
-def macd_judge(macdyellow,macdblue,macdhist):
-    return macd_hist(macdhist)
+def macd_judge(macdyellow,macdblue,macdhist,threshold):
+    return macd_hist(macdhist, threshold)
 
-    def macd_hist(macdhist):
+    def macd_hist(macdhist, threshold):
         '''
         判断MCAD 柱子曲线 是否是合适介入的状态
-        param: macdhist 今天-1
+        param: macdhist 今天排在第一个
+               threshold  柱子阈值，大于某个值才选择
         '''
         flag = False
-        mean5 = np.sum(macdhist[-5:]) / 5
-        # if macdhist[-1] >= -0.15 and macdhist[-1] <= 0.2:
-        #     #macd 柱子是红色的，且 < 0.25 ,
-        #     if macdhist[0] > macdhist[1] and macdhist[0] > mean7 and and macdhist[6] < mean7:
-        #         flag = True
-        #率柱头缩短，或者红柱头见长
-        if macdhist[-1] > macdhist[-2] and macdhist[-2] > macdhist[-3] and macdhist[-3] > macdhist[-4]:
-            falg = True
+        if macdhist[0] < threshold:
+            return flag
+
+        mean_today = np.sum(macdhist[0:5]) / 5
+        mean_before = np.sum(macdhist[3:8]) / 5
+        #抽象为 最近5天的macd 平均 是大于前3天的平均MACD的
+        if mean_today > mean_before and macdhist[0] > macdhist[1]:
+            flag = True            
         return flag
 
-    def macd_yell_blue(macdyellow, macdblue):
+    def macd_yell_blue(macdyellow, macdblue, threshold):
         '''
         判断MCAD 黄蓝线相对位置，及大小是否合适介入
         '''
-        return True
+        if macdyellow < threshold and macdblue < threshold:
+            return True
+        else:
+            return False
 
 def kdj_judge(slowk, slowd):
     '''
@@ -54,14 +59,15 @@ def kdj_judge(slowk, slowd):
 
     return falg
 
-def tang_method(data):
+def tang_method(data, threshold):
     flag = False
     macdyellow, macdblue, macdhist = ta.MACD(np.asarray(data['close']), fastperiod=12, slowperiod=26, signalperiod=9)
-    if macd_judge(macdyellow, macdblue, macdhist):
-        slowk, slowd = ta.STOCH(np.asarray(data['high']),np.asarray(data['low']), np.asarray(data['close']), 
+    if macd_judge(macdyellow, macdblue, macdhist, threshold):
+        #slowk, slowd = ta.STOCH(np.asarray(data['high']),np.asarray(data['low']), np.asarray(data['close']), 
                                     fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
-        if kdj_judge(slowk, slowd):
-            flag = True
+        # if kdj_judge(slowk, slowd):
+        #     flag = True
+        flag = True
     return flag
 
 
@@ -89,14 +95,35 @@ class TangPlan(object):
         self.foundmental_data['earn_ratio'] = self.foundmental_data['esp'] / self.foundmental_data['bvps']
         print "获取基本数据，并且计算净资产收益率"
 
-
     def tang_process(self):
-        raw_data = self.foundmental_data
-        for code in raw_data.index:
-            data = ts.get_hist_data('600848', ktype='M')
-            
+        # raw_data = self.foundmental_data
+        # month_writer = open('month_health', 'w')
+        # week_writer = open('week_health', 'w')
+        # day_writer = open('day_health', 'w')
+        #for code in raw_data.index:
+        monthdata = ts.get_k_data('600848', ktype='M')
+        weekdata = ts.get_k_data('600848', ktype='W')
+        daydata = ts.get_k_data('600848', ktype='D')
+        print tang_method(monthdata, -0.7)
+        print tang_method(weekdata, -0.35)
+        print tang_method(daydata, -0.15)
 
-    def season_good(self,):
+        # if tang_method(monthdata, -0.7):
+        #     month_writer.write(code + '\n')
+        #     if tang_method(weekdata, -0.35):
+        #         week_writer.write(code + '\n')
+        #         if tang_method(daydata,-0.15):
+        #             day_writer.write(code + '\n')
+        #             print code
+
+        # month_writer.close()
+        # week_writer.close()
+        # day_writer.close()
+
+    def month_good(self):
+        '''
+        TODO：访问自己的mysql，节约取数据时间
+        '''
         raw_data = self.foundmental_data
         ban_data = self.lift_ban_stock()
         for code in raw_data.index:
@@ -109,22 +136,6 @@ class TangPlan(object):
                 print e
                 continue
 
-
-
-    def lift_ban_stock(self, interval=6):
-        '''
-            取即将解禁的股票，默认取半年的
-        '''
-        raw_data = None
-        start_month = int(datetime.strftime(datetime.now(), '%m'))
-        start_year = int(datetime.strftime(datetime.now(), '%Y'))
-        for month in xrange(start_month, start_month+interval):
-            foot = month / 13
-            month = month%12
-            if month == 0:
-                month = 12
-            print 'get {0} {1} 解禁数据'.format(start_year+foot, month)
-            data = ts.xsg_data(year=(start_year+foot),month=month)
-            raw_data = pd.concat([raw_data, data], axis=0)
-        raw_data.index = raw_data['code']
-        return raw_data
+if __name__ == '__main__':
+    tang = TangPlan()
+    tang.tang_process()
