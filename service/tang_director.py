@@ -95,6 +95,7 @@ class TangPlan(object):
         week_writer = open('week_health', 'w')
         day_writer = open('day_health', 'w')
         for code in raw_data.index:
+            earn_ratio = raw_data.ix[code]['earn_ratio']
             if raw_data.ix[code]['area'] in badarea:
                 continue
             monthdata = ts.get_k_data(code, ktype='M')
@@ -102,12 +103,13 @@ class TangPlan(object):
             daydata = ts.get_k_data(code, ktype='D')
 
             if tang_method(monthdata, -0.7):
-                month_writer.write(code + '\n')
+                month_writer.write(code + '\t' + str(earn_ratio) + '\n')
                 if tang_method(weekdata, -0.35):
-                    week_writer.write(code + '\n')
+                    week_writer.write(code + '\t' + str(earn_ratio) + '\n')
                     if tang_method(daydata,-0.15):
-                        day_writer.write(code + '\n')
+                        day_writer.write(code + '\t' + str(earn_ratio) + '\n')
                         print code
+            sys.stdout.flush()
 
         month_writer.close()
         week_writer.close()
