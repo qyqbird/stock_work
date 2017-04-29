@@ -64,13 +64,16 @@ def kdj_judge(slowk, slowd):
 
 def tang_method(data, threshold):
     flag = False
-    macdyellow, macdblue, macdhist = ta.MACD(np.asarray(data['close']), fastperiod=12, slowperiod=26, signalperiod=9)
-    if macd_judge(macdyellow, macdblue, macdhist, threshold):
-        #slowk, slowd = ta.STOCH(np.asarray(data['high']),np.asarray(data['low']), np.asarray(data['close']), 
-        #                            fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
-        # if kdj_judge(slowk, slowd):
-        #     flag = True
-        flag = True
+    try:
+        macdyellow, macdblue, macdhist = ta.MACD(np.asarray(data['close']), fastperiod=12, slowperiod=26, signalperiod=9)
+        if macd_judge(macdyellow, macdblue, macdhist, threshold):
+            #slowk, slowd = ta.STOCH(np.asarray(data['high']),np.asarray(data['low']), np.asarray(data['close']), 
+            #                            fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+            # if kdj_judge(slowk, slowd):
+            #     flag = True
+            flag = True
+    except Exception, e:
+        pass
     return flag
 
 
