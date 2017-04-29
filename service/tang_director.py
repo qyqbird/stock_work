@@ -33,7 +33,7 @@ def macd_judge(macdyellow,macdblue,macdhist,threshold):
             #抽象为 最近5天的macd 平均 是大于前3天的平均MACD的
             if mean_today > mean_before and macdhist[-1] > macdhist[-2]:
                 flag = True 
-        except Exception e:
+        except Exception,e:
             pass
         return flag
 
