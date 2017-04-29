@@ -21,17 +21,20 @@ def macd_judge(macdyellow,macdblue,macdhist,threshold):
     def macd_hist(macdhist, threshold):
         '''
         判断MCAD 柱子曲线 是否是合适介入的状态
-        param: macdhist 今天排在第一个
+        param: macdhist 今天排在倒数第一个
                threshold  柱子阈值，大于某个值才选择
         '''
         flag = False
-        if macdhist[-1] < threshold:
-            return flag
-        mean_today = np.sum(macdhist[-6:-1]) / 5
-        mean_before = np.sum(macdhist[-9:-4]) / 5
-        #抽象为 最近5天的macd 平均 是大于前3天的平均MACD的
-        if mean_today > mean_before and macdhist[-1] > macdhist[-2]:
-            flag = True            
+        try:
+            if macdhist[-1] < threshold:
+                return flag
+            mean_today = np.sum(macdhist[-6:-1]) / 5
+            mean_before = np.sum(macdhist[-9:-4]) / 5
+            #抽象为 最近5天的macd 平均 是大于前3天的平均MACD的
+            if mean_today > mean_before and macdhist[-1] > macdhist[-2]:
+                flag = True 
+        except Exception e:
+            pass
         return flag
 
     def macd_yell_blue(macdyellow, macdblue, threshold):
@@ -86,29 +89,29 @@ class TangPlan(object):
         print "获取基本数据，并且计算净资产收益率"
 
     def tang_process(self):
-        # raw_data = self.foundmental_data
-        # month_writer = open('month_health', 'w')
-        # week_writer = open('week_health', 'w')
-        # day_writer = open('day_health', 'w')
-        #for code in raw_data.index:
-        monthdata = ts.get_k_data('300156', ktype='M')
-        weekdata = ts.get_k_data('300156', ktype='W')
-        daydata = ts.get_k_data('300156', ktype='D')
-        print tang_method(monthdata, -0.7)
-        print tang_method(weekdata, -0.35)
-        print tang_method(daydata, -0.15)
+        badarea = set(['黑龙江','辽宁','吉林'])
+        raw_data = self.foundmental_data
+        month_writer = open('month_health', 'w')
+        week_writer = open('week_health', 'w')
+        day_writer = open('day_health', 'w')
+        for code in raw_data.index:
+            if raw_data.ix[code]['area'] in badarea:
+                continue
+            monthdata = ts.get_k_data(code, ktype='M')
+            weekdata = ts.get_k_data(code, ktype='W')
+            daydata = ts.get_k_data(code, ktype='D')
 
-        # if tang_method(monthdata, -0.7):
-        #     month_writer.write(code + '\n')
-        #     if tang_method(weekdata, -0.35):
-        #         week_writer.write(code + '\n')
-        #         if tang_method(daydata,-0.15):
-        #             day_writer.write(code + '\n')
-        #             print code
+            if tang_method(monthdata, -0.7):
+                month_writer.write(code + '\n')
+                if tang_method(weekdata, -0.35):
+                    week_writer.write(code + '\n')
+                    if tang_method(daydata,-0.15):
+                        day_writer.write(code + '\n')
+                        print code
 
-        # month_writer.close()
-        # week_writer.close()
-        # day_writer.close()
+        month_writer.close()
+        week_writer.close()
+        day_writer.close()
 
     def month_good(self):
         '''
