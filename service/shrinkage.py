@@ -13,14 +13,17 @@ warnings.filterwarnings("ignore")
 
 
 def judge_shrinkage(data, threshold=0.02):
-    recentdata = data[-4:]
-    recentdata.index = [1,2,3,4]
-    yesterday_close = data[-5:-1]['close']
-    yesterday_close.index = [1,2,3,4]
-    recentdata['yesterday_close'] = yesterday_close
-    recentdata['amplitude'] = np.abs((recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close'])
-    # 根据振幅判断
-    mean = np.mean(recentdata['amplitude'])
+    try:
+        recentdata = data[-4:]
+        recentdata.index = [1,2,3,4]
+        yesterday_close = data[-5:-1]['close']
+        yesterday_close.index = [1,2,3,4]
+        recentdata['yesterday_close'] = yesterday_close
+        recentdata['amplitude'] = np.abs((recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close'])
+        # 根据振幅判断
+        mean = np.mean(recentdata['amplitude'])
+    except Exception,e:
+        return -1, 0
 
     #几个硬指标
     if recentdata.ix[4]['amplitude'] < threshold and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
