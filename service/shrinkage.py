@@ -20,8 +20,9 @@ def judge_shrinkage(data, threshold=0.02):
         yesterday_close.index = [1,2,3,4]
         recentdata['yesterday_close'] = yesterday_close
         recentdata['amplitude'] = (recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close']
-        # 根据振幅判断
         sumamp = np.abs(np.sum(recentdata['amplitude']))
+
+        recentdata['amplitude'] = np.abs(recentdata['amplitude'])
         mean = np.abs(np.mean(recentdata['amplitude']))
         if sumamp > 0.03 or mean > threshold:
             return -1, 0
@@ -44,8 +45,11 @@ class Shrinkage(object):
         fo = open('shrink_code', 'w')
         raw_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
         for code in raw_data.index:
+            totals = raw_data.ix[code]['totals']
             daydata = ts.get_k_data(code, ktype='D')
-            flag,mean = judge_shrinkage(daydata,0.15)
+            if np.array(daydata['close'])[-1] * totals > 400:
+                continue
+            flag,mean = judge_shrinkage(daydata,0.015)
             if flag != -1:
                 fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
         fo.close()
