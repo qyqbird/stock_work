@@ -5,6 +5,7 @@
 import tushare as ts
 import sys
 import numpy as np
+sys.path.append('../utility')
 sys.path.append('../stock_select')
 from download import DownLoad,TS
 
