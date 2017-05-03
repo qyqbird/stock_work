@@ -8,7 +8,8 @@ import numpy as np
 sys.path.append('../utility')
 sys.path.append('../stock_select')
 from download import DownLoad,TS
-
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def judge_shrinkage(data, threshold=0.02):
@@ -39,7 +40,7 @@ class Shrinkage(object):
         raw_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
         for code in raw_data.index:
             daydata = ts.get_k_data(code, ktype='D')
-            flag, mean = judge_shrinkage(daydata)
+            flag,mean = judge_shrinkage(daydata)
             if flag != -1:
                 fo.write("{0}\t{1}\t{2}\n".format(flag,code, mean))
         fo.close()
