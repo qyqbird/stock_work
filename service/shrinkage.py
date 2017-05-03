@@ -28,7 +28,7 @@ def judge_shrinkage(data, threshold=0.02):
         else:
             return 3,mean
     else:
-        return -1
+        return -1, mean
 
 
 class Shrinkage(object):
