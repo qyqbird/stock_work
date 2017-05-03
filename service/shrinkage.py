@@ -19,21 +19,22 @@ def judge_shrinkage(data, threshold=0.02):
         yesterday_close = data[-5:-1]['close']
         yesterday_close.index = [1,2,3,4]
         recentdata['yesterday_close'] = yesterday_close
-        recentdata['amplitude'] = np.abs((recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close'])
+        recentdata['amplitude'] = (recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close']
         # 根据振幅判断
-        mean = np.mean(recentdata['amplitude'])
+        sumamp = np.abs(np.sum(recentdata['amplitude']))
+        mean = np.abs(np.mean(recentdata['amplitude']))
+        if sumamp > 0.03 or mean > threshold:
+            return -1, 0
+        #几个硬指标
+        if recentdata.ix[4]['amplitude'] < threshold and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
+            if recentdata.ix[1]['amplitude'] < threshold:
+                return 4, mean
+            else:
+                return 3,mean
+        else:
+            return -1, mean
     except Exception,e:
         return -1, 0
-
-    #几个硬指标
-    if recentdata.ix[4]['amplitude'] < threshold and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
-        if recentdata.ix[1]['amplitude'] < threshold:
-            return 4, mean
-        else:
-            return 3,mean
-    else:
-        return -1, mean
-
 
 class Shrinkage(object):
     def __init__(self):
@@ -44,7 +45,7 @@ class Shrinkage(object):
         raw_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
         for code in raw_data.index:
             daydata = ts.get_k_data(code, ktype='D')
-            flag,mean = judge_shrinkage(daydata)
+            flag,mean = judge_shrinkage(daydata,0.15)
             if flag != -1:
                 fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
         fo.close()
