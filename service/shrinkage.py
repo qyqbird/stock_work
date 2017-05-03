@@ -24,7 +24,7 @@ def judge_shrinkage(data, threshold=0.02):
 
         recentdata['amplitude'] = np.abs(recentdata['amplitude'])
         mean = np.abs(np.mean(recentdata['amplitude']))
-        if sumamp > 0.03 or mean > threshold:
+        if sumamp > 0.02 or mean > threshold:
             return -1, 0
         #几个硬指标
         if recentdata.ix[4]['amplitude'] < 0.01 and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
@@ -47,9 +47,9 @@ class Shrinkage(object):
         for code in raw_data.index:
             totals = raw_data.ix[code]['totals']
             daydata = ts.get_k_data(code, ktype='D')
-            if np.array(daydata['close'])[-1] * totals > 400:
+            if np.array(daydata['close'])[-1] * totals > 320:
                 continue
-            flag,mean = judge_shrinkage(daydata,0.013)
+            flag,mean = judge_shrinkage(daydata,0.012)
             if flag != -1:
                 fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
         fo.close()
