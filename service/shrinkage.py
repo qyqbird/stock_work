@@ -36,7 +36,7 @@ class Shrinkage(object):
 
     def process(self):
         fo = open('shrink_code', 'w')
-        rawdata = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
+        raw_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
         for code in raw_data.index:
             daydata = ts.get_k_data(code, ktype='D')
             flag, mean = judge_shrinkage(daydata)
