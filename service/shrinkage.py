@@ -18,9 +18,10 @@ def judge_shrinkage(data, threshold=0.02):
     yesterday_close = data[-5:-1]['close']
     yesterday_close.index = [1,2,3,4]
     recentdata['yesterday_close'] = yesterday_close
-    recentdata['amplitude'] = (recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close']
+    recentdata['amplitude'] = np.abs((recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close'])
     # 根据振幅判断
     mean = np.mean(recentdata['amplitude'])
+
     #几个硬指标
     if recentdata.ix[4]['amplitude'] < threshold and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
         if recentdata.ix[1]['amplitude'] < threshold:
