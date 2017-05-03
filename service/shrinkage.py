@@ -42,7 +42,7 @@ class Shrinkage(object):
             daydata = ts.get_k_data(code, ktype='D')
             flag,mean = judge_shrinkage(daydata)
             if flag != -1:
-                fo.write("{0}\t{1}\t{2}\n".format(flag,code, mean))
+                fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
         fo.close()
 
 
