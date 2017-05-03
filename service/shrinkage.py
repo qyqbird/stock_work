@@ -27,13 +27,13 @@ def judge_shrinkage(data, threshold=0.02):
         if sumamp > 0.03 or mean > threshold:
             return -1, 0
         #几个硬指标
-        if recentdata.ix[4]['amplitude'] < threshold and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
+        if recentdata.ix[4]['amplitude'] < 0.01 and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
             if recentdata.ix[1]['amplitude'] < threshold:
                 return 4, mean
             else:
-                return 3,mean
-        else:
-            return -1, mean
+                if recentdata.ix[1]['amplitude'] < 2*threshold:
+                    return 3,mean
+        return -1, mean
     except Exception,e:
         return -1, 0
 
@@ -49,7 +49,7 @@ class Shrinkage(object):
             daydata = ts.get_k_data(code, ktype='D')
             if np.array(daydata['close'])[-1] * totals > 400:
                 continue
-            flag,mean = judge_shrinkage(daydata,0.015)
+            flag,mean = judge_shrinkage(daydata,0.013)
             if flag != -1:
                 fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
         fo.close()
