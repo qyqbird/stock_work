@@ -45,13 +45,16 @@ class Shrinkage(object):
         fo = open('shrink_code', 'w')
         raw_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
         for code in raw_data.index:
-            totals = raw_data.ix[code]['totals']
-            daydata = ts.get_k_data(code, ktype='D')
-            if np.array(daydata['close'])[-1] * totals > 320:
-                continue
-            flag,mean = judge_shrinkage(daydata,0.012)
-            if flag != -1:
-                fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
+            try:
+                totals = raw_data.ix[code]['totals']
+                daydata = ts.get_k_data(code, ktype='D')
+                if np.array(daydata['close'])[-1] * totals > 320:
+                    continue
+                flag,mean = judge_shrinkage(daydata,0.012)
+                if flag != -1:
+                    fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
+            except Exception, e:
+                    pass
         fo.close()
 
 
