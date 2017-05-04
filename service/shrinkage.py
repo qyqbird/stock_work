@@ -75,7 +75,7 @@ class Shrinkage(object):
                     continue
                 totals = raw_data.ix[code]['totals']
                 close = np.array(daydata['close'])[-1]
-                if close < 6:
+                if close < 6.5:
                     continue
                 if close * totals > 320:
                     continue
