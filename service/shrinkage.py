@@ -66,6 +66,7 @@ class Shrinkage(object):
         for code in raw_data.index:
             try:
                 ratio = judge_oversold(daydata)
+                print ratio
                 if ratio < -0.45:
                     oversold.write("{0}\t{1}\n".format(code, ratio))
                 if ratio > -0.3:
@@ -85,7 +86,7 @@ class Shrinkage(object):
                 if flag != -1:
                     fo.write("{0}\t{1}\t{2:.1%}\n".format(flag,code, mean))
             except Exception, e:
-                    pass
+                    print e
         fo.close()
 
 
