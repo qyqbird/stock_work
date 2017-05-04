@@ -65,8 +65,8 @@ class Shrinkage(object):
         raw_data['earn_ratio'] = raw_data['esp'] / raw_data['bvps']
         for code in raw_data.index:
             try:
+                daydata = ts.get_k_data(code, ktype='D')
                 ratio = judge_oversold(daydata)
-                print ratio
                 if ratio < -0.45:
                     oversold.write("{0}\t{1}\n".format(code, ratio))
                 if ratio > -0.3:
@@ -74,7 +74,6 @@ class Shrinkage(object):
                 if raw_data.ix[code]['earn_ratio'] < 0.05:
                     continue
                 totals = raw_data.ix[code]['totals']
-                daydata = ts.get_k_data(code, ktype='D')
                 close = np.array(daydata['close'])[-1]
                 if close < 6:
                     continue
