@@ -76,8 +76,6 @@ def tang_method(data, leftthreshold, rigththreshold):
         pass
     return flag
 
-
-
 class TangPlan(object):
     def __init__(self):
         #用于本地Mysql 获取数据
