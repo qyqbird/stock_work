@@ -95,7 +95,7 @@ class Shrinkage(object):
                     oversold.write("{0}\t{1}\n".format(code, ratio))
                 if ratio < 0.2:
                     weekdata = ts.get_k_data(code, ktype='W')
-                    if judge_week_shrinkage(code, 0.015):
+                    if judge_week_shrinkage(code, 0.02):
                         week_shrink.write(code + '\n')
                 if ratio > -0.3:
                     continue
