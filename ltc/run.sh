@@ -3,5 +3,5 @@ python /root/down_load/stratum-mining-proxy/mining_proxy.py -pa scrypt -o coinot
 ./minerd -a scrypt -x http:://127.0.0.1:3334 -u username -p password
 
 #不启用代理
-#./minerd -a scrypt -o stratum+tcp://coinotron.com:3334 --userpass=buring:xiao11lang 
+#./minerd -a scrypt -o stratum+tcp://coinotron.com:3334 --userpass=username:password
 
