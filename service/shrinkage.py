@@ -52,10 +52,10 @@ def judge_week_shrinkage(data, threshold=0.02):
         yesterday_close = data[-4:-1]['close']
         yesterday_close.index = [1,2,3]
         recentdata['yesterday_close'] = yesterday_close
-        recentdata['amplitude'] = (recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close']
+        recentdata['amplitude'] = (recentdata['close'] - recentdata['open']) / recentdata['open']
 
         #几个硬指标
-        if recentdata.ix[3]['amplitude'] < 0 and recentdata.ix[3]['amplitude'] > -threshold and recentdata.ix[2]['amplitude'] < 0 and recentdata.ix[3]['amplitude'] > -threshold:
+        if recentdata.ix[3]['amplitude'] < 0 and recentdata.ix[3]['amplitude'] > -threshold and recentdata.ix[2]['amplitude'] < 0.01 and recentdata.ix[3]['amplitude'] > -threshold:
             return True
         return False
     except Exception,e:
