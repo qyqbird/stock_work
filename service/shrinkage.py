@@ -23,7 +23,7 @@ def judge_shrinkage(data, threshold=0.02):
         yesterday_close = data[-5:-1]['close']
         yesterday_close.index = [1,2,3,4]
         recentdata['yesterday_close'] = yesterday_close
-        recentdata['amplitude'] = (recentdata['close'] - recentdata['yesterday_close']) / recentdata['yesterday_close']
+        recentdata['amplitude'] = (recentdata['close'] - recentdata['open']) / recentdata['open']
         sumamp = np.abs(np.sum(recentdata['amplitude']))
 
         recentdata['amplitude'] = np.abs(recentdata['amplitude'])
@@ -31,7 +31,7 @@ def judge_shrinkage(data, threshold=0.02):
         if sumamp > 0.02 or mean > threshold:
             return -1, 0
         #几个硬指标
-        if recentdata.ix[4]['amplitude'] < 0.01 and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
+        if recentdata.ix[4]['amplitude'] < 0.015 and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
             if recentdata.ix[1]['amplitude'] < threshold:
                 return 4, mean
             else:
@@ -55,7 +55,7 @@ def judge_week_shrinkage(data, threshold=0.02):
         recentdata['amplitude'] = (recentdata['close'] - recentdata['open']) / recentdata['open']
 
         #几个硬指标
-        if recentdata.ix[3]['amplitude'] < 0 and recentdata.ix[3]['amplitude'] > -threshold and recentdata.ix[2]['amplitude'] < 0.01 and recentdata.ix[3]['amplitude'] > -threshold:
+        if recentdata.ix[3]['amplitude'] < 0 and recentdata.ix[3]['amplitude'] > -threshold and recentdata.ix[2]['amplitude'] < 0.02 and recentdata.ix[3]['amplitude'] > -threshold:
             return True
         return False
     except Exception,e:
