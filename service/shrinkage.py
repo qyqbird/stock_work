@@ -55,7 +55,7 @@ def judge_week_shrinkage(data, threshold=0.02):
         recentdata['amplitude'] = (recentdata['close'] - recentdata['open']) / recentdata['open']
 
         #几个硬指标
-        if recentdata.ix[3]['amplitude'] < 0 and recentdata.ix[3]['amplitude'] > -threshold and recentdata.ix[2]['amplitude'] < 0.02 and recentdata.ix[3]['amplitude'] > -threshold:
+        if np.abs(recentdata.ix[3]['amplitude']) < threshold and np.abs(recentdata.ix[2]['amplitude']) < threshold and np.abs(recentdata.ix[1]['amplitude']) < threshold:
             return True
         return False
     except Exception,e:
