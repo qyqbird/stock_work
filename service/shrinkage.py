@@ -31,7 +31,7 @@ def judge_shrinkage(data, threshold=0.02):
         if sumamp > 0.02 or mean > threshold:
             return -1, 0
         #几个硬指标
-        if recentdata.ix[4]['amplitude'] < 0.015 and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
+        if recentdata.ix[4]['amplitude'] < threshold and recentdata.ix[3]['amplitude'] < threshold and recentdata.ix[2]['amplitude'] < threshold:
             if recentdata.ix[1]['amplitude'] < threshold:
                 return 4, mean
             else:
@@ -93,21 +93,20 @@ class Shrinkage(object):
                 ratio = judge_oversold(daydata)
                 if ratio < -0.45:
                     oversold.write("{0}\t{1}\n".format(code, ratio))
-                if ratio < 0.2:
                     weekdata = ts.get_k_data(code, ktype='W')
-                    if judge_week_shrinkage(code, 0.02):
-                        week_shrink.write(code + '\n')
+                if judge_week_shrinkage(code, 0.02):
+                    week_shrink.write(code + '\n')
                 if ratio > -0.3:
                     continue
-                if raw_data.ix[code]['earn_ratio'] < 0.05:
-                    continue
+                #if raw_data.ix[code]['earn_ratio'] < 0.05:
+                #    continue
                 totals = raw_data.ix[code]['totals']
                 close = np.array(daydata['close'])[-1]
                 if close < 6.5:
                     continue
-                if close * totals > 320:
+                if close * totals > 360:
                     continue
-                flag,mean = judge_shrinkage(daydata,0.012)
+                flag,mean = judge_shrinkage(daydata,0.02)
                 if ratio > -0.3:
                     continue
                 if flag != -1:
