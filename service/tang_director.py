@@ -85,7 +85,8 @@ class TangPlan(object):
         pass
 
     def init_foundmental_data(self):
-        self.foundmental_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
+        #self.foundmental_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
+        self.foundmental_data = ts.get_stock_basics()
         self.foundmental_data['earn_ratio'] = self.foundmental_data['esp'] / self.foundmental_data['bvps']
         print "获取基本数据，并且计算净资产收益率"
 

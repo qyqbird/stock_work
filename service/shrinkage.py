@@ -83,7 +83,8 @@ class Shrinkage(object):
         fo = open('shrink_code', 'w')
         oversold = open('oversold', 'w')
         week_shrink = open('week_shrink','w')
-        raw_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
+        #raw_data = TS.memchaced_data(ts.get_stock_basics,'get_stock_basics')
+        raw_data = ts.get_stock_basics()
         raw_data['earn_ratio'] = raw_data['esp'] / raw_data['bvps']
         for code in raw_data.index:
             if code in bad_container:
